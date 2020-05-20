@@ -109,13 +109,13 @@ weight_coef <- growthstandards::who_coefs$wtkg_agedays$Male$data %>%
   as_tibble() %>%
   filter(x < 900) %>%
   select(agedays = x, mean = m, cv = s, l = l) %>%
-  mutate(sex = "Male") %>%
+  mutate(sex = "Female") %>%
   bind_rows(
     growthstandards::who_coefs$wtkg_agedays$Female$data %>%
       as_tibble() %>%
       filter(x < 900) %>%
       select(agedays = x, mean = m, cv = s, l = l) %>%
-      mutate(sex = "Female")
+      mutate(sex = "Male")
   ) %>%
   mutate(sd = mean * cv) %>%
   select(agedays, sex, mean, sd, cv, l)
@@ -125,13 +125,13 @@ height_coef <- growthstandards::who_coefs$htcm_agedays$Female$data %>%
   as_tibble() %>%
   filter(x < 900) %>%
   select(agedays = x, mean = m, cv = s, l = l) %>%
-  mutate(sex = "Male") %>%
+  mutate(sex = "Female") %>%
   bind_rows(
     growthstandards::who_coefs$htcm_agedays$Male$data %>%
       as_tibble() %>%
       filter(x < 900) %>%
       select(agedays = x, mean = m, cv = s, l = l) %>%
-      mutate(sex = "Female")
+      mutate(sex = "Male")
   ) %>%
   mutate(sd = mean * cv) %>%
   select(agedays, sex, mean, sd, cv, l)
@@ -220,7 +220,7 @@ dpr_export(days_365, export_folder = path(package_path, "data-raw"),
 
 usethis::use_data(childhealth_dutch, childhealth_us, birth_dutch, 
                   birth_us, childhealth_maled, 
-                  height_coef, weight_coef, days_365)
+                  height_coef, weight_coef, days_365, overwrite = TRUE)
 
 dpr_document(days_365, extension = ".R.md", export_folder = usethis::proj_get(),
              object_name = "days_365", title = "Child height and weight measurements for all data from three studies at one year of age.",
