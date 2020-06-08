@@ -217,5 +217,34 @@ A data frame with columns:
 |cv       |numeric   |The coefficient of variation for children at agedays - https://en.wikipedia.org/wiki/Coefficient_of_variation |
 |l        |integer   |The box-cox tranformation for children at agedays - https://www.cdc.gov/nchs/data/nhsr/nhsr063.pdf            |
 
+## Child height and weight HAZ summaries
+
+The data is called childhealth_summary.
+
+### Description
+
+For all data from three studies
+
+The source of this data is < https://github.com/stefvanbuuren/brokenstick, https://github.com/hafen/hbgd, and https://clinepidb.org/ce/app/record/dataset/DS_5c41b87221 >
+
+### Data format
+
+A data frame with columns:
+
+|variable      |class     |description                                              |
+|:-------------|:---------|:--------------------------------------------------------|
+|subjid        |character |unique identifyer of each child                          |
+|sex           |character |Male or Female                                           |
+|country       |character |Label for the varied countries                           |
+|haz_mean      |numeric   |The average HAZ score over all measurements              |
+|waz_mean      |numeric   |The average WAZ score over all measurements              |
+|observations  |integer   |Number of observations for that subject                  |
+|agedays_last  |numeric   |The age in days for the HAZ and WAZ last variable        |
+|agedays_first |numeric   |The age in days for the HAZ and WAZ first variable       |
+|haz_last      |numeric   |The first HAZ measurement on the subject for age in days |
+|haz_first     |numeric   |The last HAZ measurement on the subject for age in days  |
+|waz_first     |numeric   |The first WAZ measurement on the subject for age in days |
+|waz_last      |numeric   |The last WAZ measurement on the subject for age in days  |
+
 
 

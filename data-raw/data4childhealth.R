@@ -154,7 +154,8 @@ days_365 <- bind_rows(
   
   childhealth_maled %>%
     filter(agedays %in% c(363:369)) %>%
-    select(subjid, sex, htcm = stcm, wtkg, haz, waz, country),
+    select(subjid, sex, htcm = stcm, wtkg, lhaz, waz, country) %>%
+    rename(haz = lhaz),
   
   childhealth_us %>%
     filter(agedays == 366) %>%
@@ -172,6 +173,43 @@ days_365_description <- list(subjid = "unique identifyer of each child",
                              country = "Label for the varied countries")
 
 
+childhealth_summary <- bind_rows(
+  childhealth_dutch %>%
+    select(subjid, agedays, sex, htcm, wtkg, haz, waz) %>%
+    mutate(country = "Finland", subjid = as.character(subjid)),
+  
+  childhealth_maled %>%
+    select(subjid, agedays,  sex, htcm = stcm, wtkg, lhaz, waz, country) %>%
+    rename(haz = lhaz),
+  
+  childhealth_us %>%
+    select(subjid, agedays, sex, htcm, wtkg, haz, waz) %>%
+    mutate(country = "United States", subjid = as.character(subjid))
+) %>%
+  as_tibble() %>%
+  group_by(subjid, sex, country) %>%
+  arrange(agedays) %>%
+  summarise(haz_mean = mean(haz, na.rm = TRUE), waz_mean = mean(waz), 
+            observations = n(), agedays_last = agedays[n()], agedays_first = agedays[1],
+            haz_last = haz[n()], haz_first = haz[1], waz_first = waz[1], waz_last = waz[n()]) %>%
+  ungroup()
+
+childhealth_summary_description <- list(subjid = "unique identifyer of each child",
+                             sex = "Male or Female",
+                             country = "Label for the varied countries",
+                             haz_mean = "The average HAZ score over all measurements",
+                             waz_mean = "The average WAZ score over all measurements",
+                             observations = "Number of observations for that subject",
+                             agedays_last = "The age in days for the HAZ and WAZ last variable",
+                             agedays_first = "The age in days for the HAZ and WAZ first variable",
+                             haz_last = "The first HAZ measurement on the subject for age in days",
+                             haz_first = "The last HAZ measurement on the subject for age in days",
+                             waz_last = "The last WAZ measurement on the subject for age in days",
+                             waz_first = "The first WAZ measurement on the subject for age in days"
+                             )
+
+
+  
     
 package_name_text <- "data4childhealth"
 base_folder <- "../../byuidatascience/"
@@ -217,16 +255,29 @@ dpr_export(weight_coef, export_folder = path(package_path, "data-raw"),
 dpr_export(days_365, export_folder = path(package_path, "data-raw"), 
            export_format = c(".csv", ".json", ".xlsx", ".sav", ".dta"))
 
+dpr_export(childhealth_summary, export_folder = path(package_path, "data-raw"), 
+           export_format = c(".csv", ".json", ".xlsx", ".sav", ".dta"))
+
+
 
 usethis::use_data(childhealth_dutch, childhealth_us, birth_dutch, 
                   birth_us, childhealth_maled, 
-                  height_coef, weight_coef, days_365, overwrite = TRUE)
+                  height_coef, weight_coef, days_365, childhealth_summary, overwrite = TRUE)
 
 dpr_document(days_365, extension = ".R.md", export_folder = usethis::proj_get(),
              object_name = "days_365", title = "Child height and weight measurements for all data from three studies at one year of age.",
              description = "A subset of measurements from the three studies.",
              source = "https://github.com/stefvanbuuren/brokenstick, https://github.com/hafen/hbgd, and https://clinepidb.org/ce/app/record/dataset/DS_5c41b87221",
              var_details = days_365_description)
+
+
+dpr_document(childhealth_summary, extension = ".R.md", export_folder = usethis::proj_get(),
+             object_name = "childhealth_summary", title = "Child height and weight HAZ summaries",
+             description = "For all data from three studies",
+             source = "https://github.com/stefvanbuuren/brokenstick, https://github.com/hafen/hbgd, and https://clinepidb.org/ce/app/record/dataset/DS_5c41b87221",
+             var_details = childhealth_summary_description)
+
+
 
 
 
