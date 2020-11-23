@@ -1,6 +1,9 @@
 pacman::p_load(tidyverse, downloader, fs, glue, rvest)
 pacman::p_load_current_gh("byuidss/DataPushR")
 
+# remotes::install_github("ki-tools/growthstandards")
+# 
+
 set.seed(150)
 
 ## Obfuscate data
@@ -58,7 +61,12 @@ childhealth_dutch_description <- list(subjid = "unique identifyer of each child"
                                       wtkg = "Weight measurement in kg (0.8-20.5)",
                                       haz = "Height in SDS relative to WHO child growth standard",
                                       waz = "Weight in SDS relative to WHO child growth standard")
-childhealth_us <- hbgd::cpp %>%
+
+hbgd_temp <- tempfile()
+download('https://github.com/HBGDki/hbgd/raw/master/data/cpp.rda', hbgd_temp, mode = 'wb')
+load(hbgd_temp)
+
+childhealth_us <- cpp %>%
   select(subjid, sex, agedays, gagebrth, htcm, wtkg, haz, waz, mrace, mage, meducyrs, ses)
 
 childhealth_us_description <- list(subjid = "unique identifyer of each child",
@@ -73,7 +81,7 @@ childhealth_us_description <- list(subjid = "unique identifyer of each child",
                                    mage = "Mother age at child birth",
                                    meducyrs = "Educational years of mother",
                                    ses = "Socioeconomic status of mother")
-                                   )
+                                   
 
 # Birthweight data
 
@@ -82,7 +90,7 @@ birth_dutch <- smocc_hgtwgt %>%
   summarise(sex = sex[1], birthwt = birthwt[1]) %>%
   ungroup()
 
-birth_us <- hbgd::cpp %>%
+birth_us <- cpp %>%
   group_by(subjid) %>%
   summarise(sex = sex[1], birthwt = birthwt[1], birthlen = birthlen[1], 
             apgar1 = apgar1[1], apgar5 = apgar5[1], mrace = mrace[1], 
@@ -150,7 +158,7 @@ days_365 <- bind_rows(
   childhealth_dutch %>%
     filter(agedays %in% c(363:369)) %>%
     select(subjid, sex, htcm, wtkg, haz, waz) %>%
-    mutate(country = "Finland", subjid = as.character(subjid)),
+    mutate(country = "Netherlands", subjid = as.character(subjid)),
   
   childhealth_maled %>%
     filter(agedays %in% c(363:369)) %>%
@@ -176,7 +184,7 @@ days_365_description <- list(subjid = "unique identifyer of each child",
 childhealth_summary <- bind_rows(
   childhealth_dutch %>%
     select(subjid, agedays, sex, htcm, wtkg, haz, waz) %>%
-    mutate(country = "Finland", subjid = as.character(subjid)),
+    mutate(country = "Netherlands", subjid = as.character(subjid)),
   
   childhealth_maled %>%
     select(subjid, agedays,  sex, htcm = stcm, wtkg, lhaz, waz, country) %>%
